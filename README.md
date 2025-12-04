@@ -102,7 +102,85 @@ This multi-panel figure confirms the model's stability and scientific validity b
 To run the full validation suite and generate the stress test figure:
 information_dynamics_stress_test.py
 
+
+# Simulation Parameters and Analysis
+
+This section summarizes the numerical setup of the model and the metrics used to evaluate the information-driven phase transition. All values match the settings used in the simulation scripts.
+
+
+## 1. Simulation Parameters
+
+| Parameter | Value | Description |
+|----------|--------|-------------|
+| Number of Particles (`N`) | **5000** | Total particles simulated in each dimension. |
+| `I` Sweep Range | **0.0 → 1.0** | Range of the informational control parameter. |
+| `ΔI` Increment | **0.05** | Step size for sweeping `I` (21 total values). |
+| Initial Diffusion Coefficient (`D0`) | **≈ 0.15** | Base noise level at `I = 0`. |
+| Noise Decay Exponent (`n`) | **3** | Used in the noise scaling law `D(I) = D0 * (1 - I)^3`. |
+| Time Step (`Δt`) | **0.01** | Integration step for the stochastic update. |
+| Steps per `I` Value | **50** | Number of relaxation/equilibration steps at each increment. |
+| Entropy Histogram Bins | **50 × 50** | Resolution for Shannon Entropy in 2D phase space. |
+
+### Core Observables
+
+**Shannon Entropy (normalized)**  
+- Measures disorder.  
+- Normalized from `0` (fully ordered) to `1` (max disorder).  
+- Drops sharply at the critical value `I_c`.
+
+**Lattice Order Parameter**  
+- Measures structural coherence (crystallinity).  
+- Computed from particle alignment with potential minima.  
+- Rises from ~0 (gas) to ~1 (crystal) as `I` increases.
+
+
+## 2. Analysis of Model Findings
+
+The simulations test whether the single parameter `I` can drive an order–disorder transition by controlling the diffusion term.
+
+### A. Causality and First-Order Dynamics
+
+**Informational Force as the Mechanism**  
+- `I` does not inject energy.  
+- It modifies the dissipation/noise term `D(I)`, similar to changing temperature.
+
+**Causality Check (Control Simulation)**  
+- A flat potential with decaying noise retains high entropy.  
+- This shows ordering requires both the deterministic force and the noise decay.
+
+**Hysteresis (First-Order Behavior)**  
+- Sweeping `I` upward and downward yields different curves.  
+- Indicates free-energy barriers and structural memory.  
+- Confirms the transition is first-order.
+
+
+## B. Emergent Regularity Across Dimensions
+
+The same qualitative pattern appears in **1D, 2D, and 3D**:
+
+- Sharp entropy collapse at `I_c`
+- Rapid rise of the order parameter
+- Hysteresis loop
+- Identical ordering trend as a function of `I`
+
+This dimensional consistency suggests an **emergent regularity** or universal-type behavior in the numerical experiments.
+
+
+## 3. Scientific Rigor and Next Steps
+
+To fully validate the claims about universality and scaling behavior, several quantitative analyses are still required.
+
+| Claim / Finding | Missing Evidence | Why It Matters |
+|------------------|------------------|----------------|
+| **Scaling Relationship** | Exact functional form (power-law, exponential, etc.) not yet extracted. | Needed to determine the true non-linear scaling behavior. |
+| **Universal-Type Pattern** | Critical exponents not computed or compared across dimensions. | Universality requires matching exponents in 1D, 2D, 3D. |
+| **Robustness to Noise Exponent** | Only tested with `n = 3`. | Need to test `n = 2`, `n = 4`, etc. to ensure transition sharpness is not parameter-dependent. |
+| **Theoretical Comparison** | No quantitative comparison to Landau theory yet. | Order-parameter behavior near `I_c` should match known theoretical predictions. |
+| **Finite-Size Effects** | No finite-size scaling or error analysis. | Necessary to confirm `I_c` is not a finite-N artifact. |
+
 **Citation**
 If you use this model in your research or teaching, please cite:
 
 Renny Chung, "Information-Driven Phase Transitions in Stochastic Systems," 2025
+
+
