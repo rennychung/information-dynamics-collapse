@@ -2,7 +2,6 @@
 
 A classical stochastic model demonstrating information-driven phase transitions and the mechanism of symmetry breaking.
 
-***
 
 ## Overview
 
@@ -10,7 +9,6 @@ This repository contains a Python-based computational model that simulates a sys
 
 By balancing a stabilizing potential force against a thermal-like noise, the model reproduces the dynamics of symmetry breaking and phase transitions, offering an intuitive classical parallel to phenomena such as quantum wavefunction collapse and measurement.
 
-***
 
 ## Methodology
 
@@ -27,7 +25,6 @@ $$
 
 The non-linear scaling of noise intensity, $D(I) \propto (1-I)^3$, is essential for modeling the rapid onset of ordering characteristic of a first-order phase transition.
 
-***
 
 ## Key Findings (Model Validation)
 
@@ -41,7 +38,6 @@ The simulation results confirm the model's fundamental physical properties:
 | **Causality** | Control group tests with a flat potential confirm that the drop in entropy and emergence of structure are **causally linked** to the potential's interaction with $I$. | **5** |
 | **Universality** | The core phase transition phenomenon is observed consistently across 1D, 2D, and 3D simulations, and is independent of the exact potential shape. | **1, 2, 3, 5** |
 
-***
 
 ## Visual Results
 
@@ -82,7 +78,6 @@ This multi-panel figure confirms the model's stability and scientific validity b
 
 <img width="1800" height="600" alt="information_dynamics_stress_model" src="https://github.com/user-attachments/assets/cb4503b4-0eff-4d62-bd64-1fa78d57e808" />
 
-***
 
 ## Repository Contents
 
@@ -93,7 +88,6 @@ This multi-panel figure confirms the model's stability and scientific validity b
 * `information_dynamics_stress_test.py`: Runs the robustness, universality, and causality validation tests.
 * `Paper_Draft.md`: Preliminary manuscript on methodology and theoretical implications.
 
-***
 
 ## Usage
 
