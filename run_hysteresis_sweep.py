@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np  # <-- CRITICAL FIX: Ensure this line is present
 import matplotlib.pyplot as plt
 import sys
 
@@ -24,7 +24,7 @@ def run_hysteresis_simulation():
     print("Initializing Simulation...")
     
     # --- Simulation Parameters ---
-    n_particles = 5000        
+    n_particles = 5000         
     steps_per_phase = 50      # Increased back to 50 for a smoother curve
     
     # *** PHYSICS TUNING FIX ***
@@ -35,27 +35,29 @@ def run_hysteresis_simulation():
     mobility_factor = 0.03    
     
     # We define the path: Ramp Up (Freezing) followed by Ramp Down (Melting)
-    i_ramp_up = np.linspace(0, 1, steps_per_phase)
-    i_ramp_down = np.linspace(1, 0, steps_per_phase)
+    # lambda is the control parameter coupling cooling and potential deepening.
+    lambda_ramp_up = np.linspace(0, 1, steps_per_phase)
+    lambda_ramp_down = np.linspace(1, 0, steps_per_phase)
     
     # Storage for results
-    history_up = {'I': [], 'H': [], 'C': []} 
-    history_down = {'I': [], 'H': [], 'C': []}
+    history_up = {'lambda_param': [], 'H': [], 'C': []}  # Renamed key
+    history_down = {'lambda_param': [], 'H': [], 'C': []} # Renamed key
     
     # Initialize particles
     x = np.random.uniform(0, 1, n_particles)
     
-    print("Running Hysteresis Loop (Memory Test)...")
+    print("Running Hysteresis Loop (Phase Transition Memory Test)...")
     
     # --- PHASE 1: FREEZING ---
-    print("Phase 1: Information Ramp Up (Freezing)...")
-    for I in i_ramp_up:
+    print("Phase 1: Control Parameter Ramp Up (Decreasing Temperature/Increasing Potential Depth)...")
+    for lambda_param in lambda_ramp_up: # CRITICAL: I replaced with lambda_param
         # Tuned coefficients to 0.03 to ensure sufficient lag
-        temperature = (1 - I)**3 * mobility_factor 
-        force_strength = I * mobility_factor
+        # As lambda_param goes from 0 to 1, temperature decreases and force increases
+        temperature = (1 - lambda_param)**3 * mobility_factor 
+        force_strength = lambda_param * mobility_factor
         
         for _ in range(relaxation_time):
-            force = -np.sin(4 * np.pi * x) 
+            force = -np.sin(4 * np.pi * x)  
             noise = np.random.normal(0, 1, n_particles)
             x_new = x + (force * force_strength) + (noise * np.sqrt(temperature))
             x_new = x_new % 1.0 
@@ -69,19 +71,20 @@ def run_hysteresis_simulation():
             
             x = x_new 
             
-        history_up['I'].append(I)
+        history_up['lambda_param'].append(lambda_param) # Updated key access
         history_up['H'].append(measure_h)
         history_up['C'].append(measure_c)
 
     # --- PHASE 2: MELTING ---
-    print("Phase 2: Information Ramp Down (Melting)...")
-    for I in i_ramp_down:
+    print("Phase 2: Control Parameter Ramp Down (Increasing Temperature/Decreasing Potential Depth)...")
+    for lambda_param in lambda_ramp_down: # CRITICAL: I replaced with lambda_param
         # Tuned coefficients to 0.03 to ensure sufficient lag
-        temperature = (1 - I)**3 * mobility_factor 
-        force_strength = I * mobility_factor
+        # As lambda_param goes from 1 to 0, temperature increases and force decreases
+        temperature = (1 - lambda_param)**3 * mobility_factor 
+        force_strength = lambda_param * mobility_factor
         
         for _ in range(relaxation_time):
-            force = -np.sin(4 * np.pi * x) 
+            force = -np.sin(4 * np.pi * x)  
             noise = np.random.normal(0, 1, n_particles)
             x_new = x + (force * force_strength) + (noise * np.sqrt(temperature))
             x_new = x_new % 1.0 
@@ -95,7 +98,7 @@ def run_hysteresis_simulation():
             
             x = x_new
             
-        history_down['I'].append(I)
+        history_down['lambda_param'].append(lambda_param) # Updated key access
         history_down['H'].append(measure_h)
         history_down['C'].append(measure_c)
 
@@ -107,24 +110,26 @@ def run_hysteresis_simulation():
     
     # Plot 1: Entropy Hysteresis
     plt.subplot(1, 2, 1)
-    plt.plot(history_up['I'], history_up['H'], color='#3b82f6', label='Ramp Up (Freezing)', linewidth=2, alpha=0.8)
-    plt.plot(history_down['I'], history_down['H'], color='#ef4444', label='Ramp Down (Melting)', linewidth=2, linestyle='--')
-    plt.fill_between(history_up['I'], history_up['H'], history_down['H'], color='#9ca3af', alpha=0.15, label='Hysteresis Area')
+    plt.plot(history_up['lambda_param'], history_up['H'], color='#3b82f6', label='Ramp Up (Freezing)', linewidth=2, alpha=0.8)
+    plt.plot(history_down['lambda_param'], history_down['H'], color='#ef4444', label='Ramp Down (Melting)', linewidth=2, linestyle='--')
+    plt.fill_between(history_up['lambda_param'], history_up['H'], history_down['H'], color='#9ca3af', alpha=0.15, label='Hysteresis Area')
     
     plt.title('Normalized Entropy Hysteresis (System Memory)', fontsize=14, fontweight='bold')
-    plt.xlabel('Information Flow (I)', fontsize=12)
+    # Fixed SyntaxWarning with raw string (r'...')
+    plt.xlabel(r'Control Parameter $\lambda$', fontsize=12) 
     plt.ylabel('Normalized Entropy (H)', fontsize=12)
     plt.legend(frameon=True, shadow=True, fancybox=True)
     plt.ylim(0, 1.05)
     
     # Plot 2: Coherence Hysteresis
     plt.subplot(1, 2, 2)
-    plt.plot(history_up['I'], history_up['C'], color='#3b82f6', label='Ramp Up (Order Increase)', linewidth=2, alpha=0.8)
-    plt.plot(history_down['I'], history_down['C'], color='#ef4444', label='Ramp Down (Order Decrease)', linewidth=2, linestyle='--')
-    plt.fill_between(history_up['I'], history_up['C'], history_down['C'], color='#9ca3af', alpha=0.15)
+    plt.plot(history_up['lambda_param'], history_up['C'], color='#3b82f6', label='Ramp Up (Order Increase)', linewidth=2, alpha=0.8)
+    plt.plot(history_down['lambda_param'], history_down['C'], color='#ef4444', label='Ramp Down (Order Decrease)', linewidth=2, linestyle='--')
+    plt.fill_between(history_up['lambda_param'], history_up['C'], history_down['C'], color='#9ca3af', alpha=0.15)
     
     plt.title('Phase Coherence Hysteresis', fontsize=14, fontweight='bold')
-    plt.xlabel('Information Flow (I)', fontsize=12)
+    # Fixed SyntaxWarning with raw string (r'...')
+    plt.xlabel(r'Control Parameter $\lambda$', fontsize=12) 
     plt.ylabel('Phase Coherence', fontsize=12)
     plt.legend(frameon=True, shadow=True, fancybox=True)
 
@@ -132,8 +137,9 @@ def run_hysteresis_simulation():
     
     # Save file
     try:
-        plt.savefig('information_dynamics_hysteresis.png')
-        print("Plot saved to 'information_dynamics_hysteresis.png'")
+        # File name updated
+        plt.savefig('phase_transition_hysteresis.png')
+        print("Plot saved to 'phase_transition_hysteresis.png'")
     except Exception as e:
         print(f"Warning: Could not save image file: {e}")
 

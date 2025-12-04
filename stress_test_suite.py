@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import entropy
 import sys
 
 # Wrap the import in try/except to catch missing scipy immediately
@@ -21,21 +20,23 @@ def run_variant(n_particles=2000, exponent=3, potential_type='cosine'):
     # Using a higher number of steps to ensure equilibrium for these tests
     n_steps = 200
     # Increased to 50 points for smoother lines
-    i_values = np.linspace(0, 1, 50) 
+    lambda_values = np.linspace(0, 1, 50) # Renamed from i_values 
     avg_entropies = []
     
-    for I in i_values:
-        # Initialize particles randomly at the start of each I value sweep
+    # CRITICAL: I replaced with lambda_param
+    for lambda_param in lambda_values:
+        # Initialize particles randomly at the start of each lambda_param value sweep
         x = np.random.uniform(0, 1, n_particles)
         
         # Physics Parameters (using original 0.15 since this is NOT the hysteresis test)
-        temperature = (1 - I)**exponent * 0.15 
-        force_strength = I * 0.15
+        # As lambda_param goes 0 to 1, temperature decreases and force strength increases
+        temperature = (1 - lambda_param)**exponent * 0.15 # I replaced with lambda_param
+        force_strength = lambda_param * 0.15 # I replaced with lambda_param
         
         for t in range(n_steps):
             # 1. Define Potential / Force
             if potential_type == 'cosine':
-                # Your original potential: Multi-well (2 periods in length 1)
+                # Original potential: Multi-well (2 periods in length 1)
                 force = -np.sin(4 * np.pi * x)
             elif potential_type == 'double_well':
                 # Classic Quartic Double Well: V = x^4 - x^2 centered at 0.5
@@ -68,12 +69,13 @@ def run_variant(n_particles=2000, exponent=3, potential_type='cosine'):
                 avg_entropies.append(e)
             
             
-    return i_values, avg_entropies
+    return lambda_values, avg_entropies # Renamed return value
 
 def run_stress_test():
     """Executes the three validation tests and generates a combined plot."""
     
-    print("Starting Information Dynamics Stress Test Suite...")
+    # Renamed description
+    print("Starting Phase Transition Parameter Test Suite...")
     
     # Using a cleaner style
     plt.style.use('seaborn-v0_8-darkgrid')
@@ -88,12 +90,14 @@ def run_stress_test():
     
     # Testing how sensitive the transition is to the rate the noise decays
     for i, exp in enumerate([2, 3, 4]):
-        iv, ent = run_variant(exponent=exp)
-        # Apply distinct style and small marker size
-        plt.plot(iv, ent, styles[i], linewidth=2, markersize=3, label=f'Noise Decay Power (1-I)^{exp}')
+        # Renamed variable
+        lambda_val, ent = run_variant(exponent=exp)
+        # FIX APPLIED HERE: Used raw f-string (rf'...') to resolve SyntaxWarning
+        plt.plot(lambda_val, ent, styles[i], linewidth=2, markersize=3, label=rf'Noise Decay Power (1-$\lambda$)^{exp}')
     
-    plt.title('Robustness: Effect of Noise Decay Rate', fontsize=14)
-    plt.xlabel('Information Flow (I)', fontsize=12)
+    plt.title('Robustness: Effect of Cooling Rate Exponent', fontsize=14)
+    # Fixed SyntaxWarning using raw string (r'...') and updated label
+    plt.xlabel(r'Control Parameter $\lambda$', fontsize=12) 
     plt.ylabel('Normalized Entropy', fontsize=12)
     # Legend fixed to 'lower left' to avoid collision.
     plt.legend(loc='lower left')
@@ -106,11 +110,13 @@ def run_stress_test():
     
     # Testing if the phase transition still occurs with a different underlying structure
     for i, shape in enumerate(shapes):
-        iv, ent = run_variant(potential_type=shape)
-        plt.plot(iv, ent, styles[i], linewidth=2, markersize=3, label=f'Potential: {shape}')
+        # Renamed variable
+        lambda_val, ent = run_variant(potential_type=shape)
+        plt.plot(lambda_val, ent, styles[i], linewidth=2, markersize=3, label=f'Potential: {shape}')
         
-    plt.title('Universality: Potential Shape', fontsize=14)
-    plt.xlabel('Information Flow (I)', fontsize=12)
+    plt.title('Universality: Potential Shape Dependence', fontsize=14)
+    # Fixed SyntaxWarning using raw string (r'...') and updated label
+    plt.xlabel(r'Control Parameter $\lambda$', fontsize=12) 
     plt.legend(loc='lower left')
     plt.grid(True, alpha=0.3)
 
@@ -119,21 +125,23 @@ def run_stress_test():
     plt.subplot(1, 3, 3)
     
     # Run standard (Experimental Group)
-    iv_exp, ent_exp = run_variant(potential_type='cosine')
-    plt.plot(iv_exp, ent_exp, 'b-o', linewidth=2, markersize=3, label='Experimental (Cosine Structure)')
+    lambda_exp, ent_exp = run_variant(potential_type='cosine') # Renamed variable
+    plt.plot(lambda_exp, ent_exp, 'b-o', linewidth=2, markersize=3, label='Experimental (Cosine Structure)')
     
     # Run flat (Control Group)
-    iv_ctrl, ent_ctrl = run_variant(potential_type='flat')
-    plt.plot(iv_ctrl, ent_ctrl, 'r--', linewidth=2, label='Control (Flat Structure)')
+    lambda_ctrl, ent_ctrl = run_variant(potential_type='flat') # Renamed variable
+    plt.plot(lambda_ctrl, ent_ctrl, 'r--', linewidth=2, label='Control (Flat Structure)')
     
     plt.title('Causality: Structure vs. No Structure', fontsize=14)
-    plt.xlabel('Information Flow (I)', fontsize=12)
+    # Fixed SyntaxWarning using raw string (r'...') and updated label
+    plt.xlabel(r'Control Parameter $\lambda$', fontsize=12) 
     plt.legend(loc='lower left')
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout(pad=3.0)
-    plt.savefig('information_dynamics_stress_test_results.png')
-    print("Stress test complete. Saved to 'information_dynamics_stress_test_results.png'.")
+    # Renamed output file
+    plt.savefig('phase_transition_parameter_test_results.png')
+    print("Parameter test suite complete. Saved to 'phase_transition_parameter_test_results.png'.")
     plt.show()
 
 if __name__ == "__main__":
