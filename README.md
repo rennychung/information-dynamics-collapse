@@ -1,108 +1,100 @@
-# Information Dynamics: A Classical Model of Wavefunction Collapse
+# Coordinated Phase Transitions: A Minimal Classical Model
 
-A classical stochastic model demonstrating information-driven phase transitions and the mechanism of symmetry breaking.
+This repository presents a numerical simulation of a first-order phase transition modeled using the Langevin Equation (SDE) in 1D, 2D, and 3D. The transition from a disordered, high-entropy state ("Gas") to an ordered, low-entropy state ("Crystal") is achieved through the coordinated scaling of two thermodynamic control variables: **Effective Temperature ($T$)** and **Potential Energy Strength ($V$)**.
 
-
-## Overview
-
-This repository contains a Python-based computational model that simulates a system where a control parameter, the information flow ($I$), drives a phase transition analogous to thermodynamic cooling.
-
-By balancing a stabilizing potential force against a thermal-like noise, the model reproduces the dynamics of symmetry breaking and phase transitions, offering an intuitive classical parallel to phenomena such as quantum wavefunction collapse and measurement.
+The framework explores minimal conditions necessary for symmetry breaking in classical non-equilibrium systems.
 
 
-## Methodology
+## Model Formulation
 
-The system's dynamics are governed by the following stochastic differential equation (SDE), where the noise and force terms are coupled via the control parameter $I$:
+The system's dynamics are governed by a single control parameter, **$\lambda$**, which scales the driving forces simultaneously:
+
+- **Potential Scaling (Drift Term):** The attractive force of the potential wells scales linearly with $\lambda$.  
+- **Thermal Cooling (Noise Term):** The effective temperature (noise intensity) decreases rapidly (cubically) as $\lambda$ increases.
+
+The generalized Stochastic Differential Equation (SDE) is:
 
 $$
-dx = \left(-I \cdot \nabla V(x)\right) dt + \sqrt{D(I)} \cdot dW_t
+d\mathbf{x} = -\lambda \nabla V(\mathbf{x}) \, dt + \sqrt{D(\lambda)} \, d\mathbf{W}_t
 $$
 
-* **$I$** is the information control parameter ($0 \le I \le 1$).
-* **$-I \cdot \nabla V(x)$** is the ordering force, increasing linearly with $I$.
-* **$D(I)$** is the Noise Intensity (Diffusion Coefficient), which is proportional to $(1-I)^3$.
-* **$dW_t$** is the increment of the Wiener process (Gaussian white noise).
+Where:
 
-The non-linear scaling of noise intensity, $D(I) \propto (1-I)^3$, is essential for modeling the rapid onset of ordering characteristic of a first-order phase transition.
-
-
-## Key Findings (Model Validation)
-
-The simulation results confirm the model's fundamental physical properties:
-
-| Feature | Description | Supporting Figure |
-| :--- | :--- | :--- |
-| **Thermodynamic Analogy** | Increasing $I$ drives the system from a high-entropy "Gas" state (disordered) to a low-entropy "Crystal" state (ordered), behaving identically to thermodynamic cooling. | **1, 2** |
-| **First-Order Transition** | The system exhibits hysteresis (system memory), proving that the transition is a first-order phase transition where the path to order differs from the path to disorder. | **4** |
-| **Robustness** | The transition threshold is consistent across variations in the noise decay exponent, confirming the model's stability against parameter tuning. | **5** |
-| **Causality** | Control group tests with a flat potential confirm that the drop in entropy and emergence of structure are **causally linked** to the potential's interaction with $I$. | **5** |
-| **Universality** | The core phase transition phenomenon is observed consistently across 1D, 2D, and 3D simulations, and is independent of the exact potential shape. | **1, 2, 3, 5** |
+- $V(\mathbf{x})$ is a periodic, multi-well potential (e.g., $V(\mathbf{x}) \propto \sum_i \cos(4 \pi x_i)$)  
+- $D(\lambda) \propto (1 - \lambda)^3$ is the $\lambda$-dependent diffusion coefficient  
+- $\lambda \in [0, 1]$ is the single, dimensionless control parameter  
 
 
-## Visual Results
+## Key Results and Simulations
 
-### 1. 1D Bifurcation and Core Analysis 
+The repository includes four core Python scripts implementing the model using the Euler-Maruyama method:
 
-This figure illustrates the pitchfork bifurcation, the mathematical mechanism driving the phase change. As the information flow ($I$) increases past a critical value, the single, uniform probability distribution (high-entropy state) splits into multiple stable, localized peaks (low-entropy states). This transition represents the spontaneous symmetry breaking in the system's position.
-
-<img width="1000" height="600" alt="information_dynamics_1d_concept" src="https://github.com/user-attachments/assets/7ec46d0a-b5fa-4390-a87c-9abff49b17f8" />
-
-
-
-### 2. 2D Entropy and Crystallinity Dashboard 
-
-This dashboard provides both quantitative and visual evidence in two dimensions. The sharp drop in shannon entropy (the thermodynamic measure) aligns perfectly with the rise in the lattice order parameter (the structural measure), demonstrating the transition from a disordered gas to an ordered crystal.
+| Script | Dimension | Primary Analysis | Output File |
+|--------|-----------|----------------|-------------|
+| `run_1d_bifurcation.py` | 1D | Phase Space Bifurcation Map | `classical_phase_transition_1d_bifurcation.png` |
+| `run_2d_analysis_dashboard.py` | 2D | Entropy / Order Parameter Sweep vs Control | `classical_phase_transition_2d_dashboard.png` |
+| `run_3d_ensemble_analysis.py` | 3D | Ensemble Statistics & 3D Visualization | `classical_phase_transition_3d_ensemble.png` |
+| `run_hysteresis_sweep.py` | 2D | Hysteresis Loop (First-Order Check) | `classical_phase_transition_hysteresis.png` |
 
 
+### 1. 2D Analysis Dashboard (`run_2d_analysis_dashboard.py`)
 
-<img width="1400" height="1000" alt="information_dynamics_2d_dashboard" src="https://github.com/user-attachments/assets/9a630df3-42a2-4b42-af4d-8441215e3c0c" />
+Demonstrates the core thesis: the phase transition only occurs when potential strengthening and thermal cooling are coordinated.
 
-### 3. 3D Ensemble 
+Metrics plotted vs control parameter $\lambda$:
 
-A visual confirmation of the phase progression in a three-dimensional lattice: from a uniformly spread gas state ($I=0.0$) through the clustering transition state ($I=0.6$), ending in the highly localized crystal state ($I=1.0$).
+- **Order Parameter:** Measures spatial coherence (crystallinity)  
+- **Normalized Entropy:** Measures thermodynamic disorder  
 
-
-<img width="1500" height="600" alt="information_dynamics_3d_ensemble" src="https://github.com/user-attachments/assets/917daad0-3cee-461a-a292-297f0a021eb2" />
-
-### 4. Normalized Entropy Hysteresis 
-
-This plot shows the separation between the ramp Up (Freezing) and ramp down (Melting) curves for Normalized Entropy. The resulting hysteresis area proves that the system's state is history-dependent, confirming the transition is a first-order phase transition.
+Includes a Control Group (Cooling Only, $\lambda \nabla V = 0$) to show that the entropy drop is specifically due to the potential.
 
 
-<img width="1400" height="600" alt="information_dynamics_hysteresis" src="https://github.com/user-attachments/assets/841ff4a7-d141-4ee1-b433-ee261b2b9a97" />
+### 2. 1D Bifurcation Plot (`run_1d_bifurcation.py`)
 
-### 5. Stress Test 
+Visually confirms bifurcation of the particle density in phase space:
 
-This multi-panel figure confirms the model's stability and scientific validity by showing robustness (varying noise exponents), universality (different potentials), and the strong causality provided by the control group test.
-
-
-<img width="1800" height="600" alt="information_dynamics_stress_model" src="https://github.com/user-attachments/assets/cb4503b4-0eff-4d62-bd64-1fa78d57e808" />
+- **Low $\lambda$ (High $T$):** Particles diffuse across the domain (single branch)  
+- **High $\lambda$ (Low $T$):** Particles localize into energy minima (multiple branches)  
 
 
-## Repository Contents
+### 3. 3D Ensemble Analysis (`run_3d_ensemble_analysis.py`)
 
-* `information_dynamics_1d_concept.py`: Generates the 1D bifurcation plot.
-* `information_dynamics_2d_analysis.py`: Runs the 2D sweep and generates the dashboard plot.
-* `information_dynamics_3d_stats.py`: Runs the 3D ensemble simulation and visualization.
-* `information_dynamics_hysteresis.py`: Runs the freezing/melting cycle to generate the hysteresis loop.
-* `information_dynamics_stress_test.py`: Runs the robustness, universality, and causality validation tests.
-* `Paper_Draft.md`: Preliminary manuscript on methodology and theoretical implications.
+Provides statistical evidence in 3D, showing the bulk shift from Gas ($\lambda=0$) to Crystal ($\lambda=1$).
+
+Key snapshots of particle distributions:
+
+- **$\lambda = 0.0$:** High entropy, disordered Gas  
+- **$\lambda = 0.6$:** Transition zone, partial ordering  
+- **$\lambda = 1.0$:** Low entropy, ordered Crystal  
 
 
-## Usage
+### 4. Hysteresis Sweep (`run_hysteresis_sweep.py`)
+
+Sweeps the control parameter $\lambda$ up (heating) and down (cooling) to check for a separation between forward and backward paths in the Order Parameter ($M$).
+
+- Presence of a loop confirms the system exhibits **hysteresis**, a signature of a first-order phase transition.
+
+
+## Running the Simulations
 
 ### Prerequisites
 
-* `numpy`
-* `matplotlib`
-* `scipy`
+- Python 3.8+  
+- `numpy`, `matplotlib`, `scipy`
 
-### Running the Simulation
+### Execution
 
-To run the full validation suite and generate the stress test figure:
-information_dynamics_stress_test.py
+Run each script independently:
 
-**Citation**
-If you use this model in your research or teaching, please cite:
+```bash
+# Generate the 1D bifurcation map
+python run_1d_bifurcation.py
 
-Renny Chung, "Information-Driven Phase Transitions in Stochastic Systems," 2025
+# Generate the 2D dashboard (Entropy vs Order)
+python run_2d_analysis_dashboard.py
+
+# Generate the 3D visualization and statistics
+python run_3d_ensemble_analysis.py
+
+# Generate the Hysteresis loop
+python run_hysteresis_sweep.py
